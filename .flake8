@@ -1,0 +1,19 @@
+[flake8]
+ignore = E226,E302,E41,W503
+max-line-length = 79
+exclude =
+    .vscode,
+    src/build,
+    src/fonts,
+    src/img,
+    tests,
+    __pycache__,
+    .venv/,
+    ~/.vscode
+max-complexity = 12
+show-source = True
+filename = *.py
+accept-encoding = utf-8
+inline-quotes = single
+max-linenumber = 500
+multiline-quotes = double

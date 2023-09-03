@@ -1,0 +1,24 @@
+{
+  "#slider_difficulty": {
+    "colours": {
+      "dark_bg": "#e9baf8"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "5",
+      "enable_arrow_buttons": "0",
+      "sliding_button_width": "15"
+    }
+  },
+  "#slider_difficulty.#sliding_button": {
+    "colours": {
+      "normal_bg": "#8807bf",
+      "hovered_bg": "#b60aff",
+      "active_bg": "#b60aff"
+    },
+    "misc": {
+      "shape": "ellipse",
+      "border_width": "0"
+    }
+  }
+}
