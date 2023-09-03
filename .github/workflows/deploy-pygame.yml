@@ -25,7 +25,7 @@ jobs:
           python -m pip install -r $GITHUB_WORKSPACE/requirements.txt
           echo "Successfully installed dependencies"
           echo "Attempting to build the game"
-          python -m pygbag --build $GITHUB_WORKSPACE/src
+          python -m pygbag --ume_block=0 --build $GITHUB_WORKSPACE/src
           echo "Successfully build the game and complied to WebAssembly"
           echo "Deploying to gh-pages"
 
