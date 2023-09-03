@@ -4,7 +4,11 @@ Yet another Sudoku game in python.
 
 ## Description
 
-My pgame implementation of popular Sudoku game with setup for pygbag wasm.
+Pgame implementation of popular Sudoku game with setup for pygbag wasm.
+
+Play [Sudoku](https://maxoflondon.github.io/sudoku/index.html) now on Github.
+
+> **_NOTE:_** Takes some time to load first time, please be patient.
 
 ### Installing
 
