@@ -1,0 +1,36 @@
+name: CI Sudoku workflow
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull-request:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-pygbag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # - uses: actions/setup-python@v2
+      - name: Install Dependencies
+        run: |
+          echo "Attempting to install dependencies"
+          python -m pip install -r $GITHUB_WORKSPACE/requirements.txt
+          echo "Successfully installed dependencies"
+          echo "Attempting to build the game"
+          python -m pygbag --build $GITHUB_WORKSPACE/src
+          echo "Successfully build the game and complied to WebAssembly"
+          echo "Deploying to gh-pages"
+
+      - name: "Upload to GitHub pages branch gh-pages"
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: src/build/web
+        run: echo "Deployed successfuly"
