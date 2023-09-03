@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ### Executing program
 
-You can test run the game using `install-and-test-run.sh` script. It will offer to lauch game with python and in the web browser.
+You can test run the game using `install-and-test-run.sh` script. It will offer to launch game with python and then in the web browser.
 
 Altenatively, to run game manually with Python:
 
