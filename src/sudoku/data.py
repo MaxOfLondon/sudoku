@@ -1,6 +1,8 @@
+# -*- coding: utf-8
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import List
+
 
 @dataclass
 class Data():

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8
 from os.path import abspath, dirname, join
 from typing import Any, Tuple
 
@@ -9,7 +9,7 @@ from pygame_gui.core import ObjectID
 from .constants import CUSTOM_EVENT, WHITE
 
 BASE_PATH = abspath(dirname(__file__))
-IMAGE_PATH = BASE_PATH + "/../img"
+IMAGE_PATH = BASE_PATH + '/../img'
 
 class RoundButton(pygame.sprite.Sprite):
     def __init__(
@@ -76,7 +76,7 @@ class Hud:
         self.surf_top_bg.blit(kwargs['start_surf'], kwargs['top_rect'])
 
         self.ui_manager = kwargs['ui_manager']
-        self.clock_font = pygame.font.SysFont("freesans", 40)
+        self.clock_font = pygame.font.SysFont('freesans', 40)
 
         self.controls_btm = []
         self.controls_top = []

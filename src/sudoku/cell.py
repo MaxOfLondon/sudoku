@@ -1,6 +1,7 @@
+# -*- coding: utf-8
 from os.path import abspath, dirname, join, normpath
 from types import SimpleNamespace
-from typing import Optional, Tuple, TypedDict, Union, List
+from typing import List, Optional, Tuple, TypedDict, Union
 
 import pygame
 

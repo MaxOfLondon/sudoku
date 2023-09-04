@@ -1,5 +1,7 @@
+# -*- coding: utf-8
 import functools
 import time
+
 
 def timer(func):
     """ Print the runtime of the decorated function """

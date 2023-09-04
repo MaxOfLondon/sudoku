@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import asyncio
 import os
 from os.path import abspath, dirname
@@ -13,7 +14,7 @@ from .hud import Hud
 from .logic import Logic
 
 BASE_PATH = abspath(dirname(__file__))
-IMAGE_PATH = BASE_PATH + "/../img/"
+IMAGE_PATH = BASE_PATH + '/../img/'
 IMG_NAMES = [str(i) for i in range(1, 10)] \
     + ['delete', 'hint', 'start', 'gameover', 'reset', 'pause']
 IMAGES = {
@@ -43,7 +44,7 @@ class Game:
 
         self.ui_manager = pygame_gui.UIManager(
             self.game_screen_rect.size,
-            os.path.join(os.path.abspath("."), 'sudoku/theme.json')
+            os.path.join(os.path.abspath('.'), 'sudoku/theme.json')
         )
 
         self.clock = pygame.time.Clock()

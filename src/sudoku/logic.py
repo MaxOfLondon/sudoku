@@ -1,6 +1,8 @@
+# -*- coding: utf-8
 import copy
 import random
 from typing import List
+
 
 class Logic:
     def is_game_over(
@@ -64,7 +66,7 @@ class Logic:
         side = base * base
         numSize = len(str(side))
         for line in board:
-            print("["+"  ".join(f"{n or '.':{numSize}}" for n in line)+"]")
+            print('['+'  '.join(f"{n or '.':{numSize}}" for n in line)+']')
 
     def _solve_sudoku(self, board):
         size = len(board)

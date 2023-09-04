@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 import asyncio
 import os
 import sys
@@ -24,7 +25,7 @@ if sys.platform in ('emscripten', 'wasi'):
     import platform
     platform.window.onbeforeload = None
     platform.window.onbeforeunload = None
-    platform.document.body.style.background = "#e6f2ff"
+    platform.document.body.style.background = '#e6f2ff'
 
 async def main():
     game = Game()

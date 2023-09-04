@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 FPS = 30
 WIDTH, HEIGHT = 500, 600
 FONT_SCALE = 0.75
