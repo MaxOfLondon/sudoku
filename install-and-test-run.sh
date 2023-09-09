@@ -2,7 +2,22 @@
 
 # Usage:
 # chmod +x ./install-and-test-run.sh
+# # for development:
+# source ./install-and-test-run.sh dev
+# # for production:
 # source ./install-and-test-run.sh
+# # or for production:
+# source ./install-and-test-run.sh prod
+
+DEFAULT_ENV="prod"
+PROCEED_ENV=$1
+PROCEED_ENV="${PROCEED_ENV:-${DEFAULT_ENV}}"
+echo "requirements/$PROCEED_ENV.txt"
+[[ -f "requirements/$PROCEED_ENV.txt" ]] || {
+    echo -e "\033[31m[!] Invalid parameter specified, valid values [dev/prod]\033[0m"
+    exit 2
+}
+
 
 confirm() {
     DEFAULT="y"
@@ -25,7 +40,7 @@ in_venv=$(python3 -c 'import sys; print ("1" if hasattr(sys, "real_prefix") else
 python3 -m pip install --user virtualenv
 virtualenv -q -p /usr/bin/python3 .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r "requirements/$PROCEED_ENV.txt"
 
 # run
 cd src
