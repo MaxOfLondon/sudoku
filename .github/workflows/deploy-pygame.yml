@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           echo "Attempting to install dependencies"
-          python -m pip install -r $GITHUB_WORKSPACE/requirements.txt
+          python -m pip install -r $GITHUB_WORKSPACE/requirements/prod.txt
           echo "Successfully installed dependencies"
           echo "Attempting to build the game"
           python -m pygbag --ume_block=0 --build $GITHUB_WORKSPACE/src
