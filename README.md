@@ -18,7 +18,10 @@ Run below commands to download project, setup virtualenv and install dependencie
 git clone https://github.com/MaxOfLondon/sudoku
 cd sudoku
 chmod +x install-and-test-run.sh
-source install-and-test-run.sh
+# for development:
+source install-and-test-run.sh dev
+# for production (default if no argument given):
+source install-and-test-run.sh prod
 ```
 
 If you prefer to intall manually, run:
@@ -27,7 +30,10 @@ If you prefer to intall manually, run:
 python3 -m pip install --user virtualenv
 virtualenv -q -p /usr/bin/python3 .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+# for development:
+pip install -r requirements/dev.txt
+# for production:
+pip install -r requirements/prod.txt
 ```
 
 ### Executing program

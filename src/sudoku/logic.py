@@ -1,23 +1,22 @@
 # -*- coding: utf-8
 import copy
 import random
-from typing import List
+from typing import List, Tuple
 
 
 class Logic:
-    def is_game_over(
-        self, input: List[int], solution: List[int]
-    ):
-        if 0 in input:
+    def is_game_over(self, inputs: List[int], solution: List[int]) -> bool:
+        if 0 in inputs:
             return False
-        return input == solution
+        return inputs == solution
 
-    def create_game(self, difficulty: int = 50) -> tuple[list[int]]:
+    def create_game(self, difficulty_percent: int = 50) \
+            -> Tuple[List[int], List[int]]:
         solution = self._create_solution()
-        puzzle = self._create_puzzle(solution, difficulty)
+        puzzle = self._create_puzzle(solution, difficulty_percent)
         return solution, puzzle
 
-    def _create_solution(self):
+    def _create_solution(self) -> List[List[int]]:
         base = 3
         side = base * base
 
@@ -46,12 +45,13 @@ class Logic:
             for row in rows
         ]
 
-    def _create_puzzle(self, solution, difficulty):
+    def _create_puzzle(self, solution, difficulty_percent):
         def scaled_clamp(value, from1, to1, from2, to2):
             return (value - from1) / (to1 - from1) * (to2 - from2) + from2
 
         puzzle = copy.deepcopy(solution)
-        diff = scaled_clamp(float(difficulty+1), 1.0, 100.0, 3/10, 8/10)
+        diff = scaled_clamp(
+            float(difficulty_percent+1), 1.0, 100.0, 3/10, 8/10)
         base = 3
         side = base * base
         num_squares = side * side
@@ -60,13 +60,6 @@ class Logic:
         for subset in random.sample(range(num_squares), num_empties):
             puzzle[subset // side][subset % side] = 0
         return puzzle
-
-    def _print_board(self, board, title):
-        base = 3
-        side = base * base
-        numSize = len(str(side))
-        for line in board:
-            print('['+'  '.join(f"{n or '.':{numSize}}" for n in line)+']')
 
     def _solve_sudoku(self, board):
         size = len(board)
@@ -101,3 +94,4 @@ class Logic:
                 ]
                 yield solution
                 empty -= 1
+        return solution

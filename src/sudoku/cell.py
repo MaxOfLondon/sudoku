@@ -5,7 +5,9 @@ from typing import List, Optional, Tuple, TypedDict, Union
 
 import pygame
 
-from .constants import BLACK, BUBBLEGUM, CREAM, CUSTOM_EVENT, FONT_SCALE, WHITE
+from .constants import (BLACK, BUBBLEGUM, CREAM, CUSTOM_EVENT_TYPE, FONT_SCALE,
+                        WHITE)
+from .util import attributes
 
 BASE_PATH = abspath(dirname(__file__))
 
@@ -28,7 +30,7 @@ class CellArgs(TypedDict):
 
 
 class Cell():
-    id = -1
+    cid = -1
     value = 0
     color = '#ffffff'
     border_color = '#000000'
@@ -50,7 +52,7 @@ class Cell():
     _show_value = True
     _selected = False
 
-    def __init__(self, rect: pygame.Rect, **kwargs: CellArgs):
+    def __init__(self, rect: pygame.Rect, **kwargs: CellArgs) -> None:
         """A square cell with a digit displayed.
         Offers theming of borders, selection and background colors.
 
@@ -94,7 +96,7 @@ class Cell():
             border_bottom: int = 1
                 Thickness of the border in pixels.
 
-        Returns: Cell object
+        Returns: None
         """
         self.rect = pygame.Rect(
             (rect.left, rect.top),
@@ -105,7 +107,7 @@ class Cell():
             .convert_alpha()
 
         kwargs_list = [
-            'id',
+            'cid',
             'value',
             'is_definite',
             'is_show_value',
@@ -134,13 +136,13 @@ class Cell():
         if 'parent_surf' in kwargs:
             self.parent_surf = kwargs.get('parent_surf')
         else:
-            self.parent_surf = pygame.display.get_surface()
+            self.parent_surf = pygame.display.get_surface()  # pragma no cover
 
         if self.font_size is None:
             self.font_size = int(self._dimension * FONT_SCALE)
         if self.font is None:
             if not pygame.font.get_init():
-                pygame.font.init()
+                pygame.font.init()  # pragma no cover
             self.font = pygame.font.Font(
                 normpath(join(BASE_PATH, '../fonts/FreeSans.otf')),
                 self.font_size)
@@ -152,6 +154,12 @@ class Cell():
 
         self._set_border_offset()
         self._set_selected_offset()
+
+    def __repr__(self):
+        return attributes(self)  # pragma no cover
+
+    def __str__(self):
+        return str(attributes(self))
 
     def draw(self):
         self._draw_background()
@@ -167,9 +175,9 @@ class Cell():
         if self.rect.collidepoint(pos) and not self._definite:
             self._toggle_selected()
             event = pygame.event.Event(
-                CUSTOM_EVENT,
+                CUSTOM_EVENT_TYPE,
                 key='selection_change',
-                id=self.id,
+                cid=self.cid,
                 selected=self._selected)
             pygame.event.post(event)
 
@@ -241,8 +249,6 @@ class Cell():
         if self._definite:
             color = self.definite_color
         elif self._hint_on:
-            if self.id == 0:
-                pass
             if not self._guessed and self.value > 0:
                 color = BUBBLEGUM
         self.color = f'#{color[0]:02x}{color[1]:02x}{color[2]:02x}'
@@ -257,11 +263,11 @@ class Cell():
 
     def _draw_number(self):
         if (self._show_value and self.value):
-            text = self.font.render(str(self.value), True, BLACK, self.color)
-            text_rect = text.get_rect(center=(
+            surf = self.font.render(str(self.value), True, BLACK, self.color)
+            rect = surf.get_rect(center=(
                 self._dimension//2, (self._dimension//2)*1.1)
             )
-            self.surf.blit(text, text_rect)
+            self.surf.blit(surf, rect)
 
     def _draw_border(self):
         # left

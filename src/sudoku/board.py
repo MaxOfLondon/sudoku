@@ -4,10 +4,12 @@ from typing import List, Tuple
 import pygame
 
 from .cell import Cell
-from .constants import WHITE
+from .constants import DEFAULT_BORDER_WIDTH, WHITE
 
 
 class Board:
+    cells = []
+
     def __init__(self, rect: pygame.Rect, puzzle: List[List[int]]) -> None:
         self.game_screen = pygame.display.get_surface()
         self.square_size = rect.width // 9
@@ -18,59 +20,63 @@ class Board:
         self.cells = [
             Cell(
                 self._make_rect(index),
-                id=index,
+                cid=index,
                 value=value,
                 is_definite=bool(value),
-                border=self._make_border(index),
+                border=self._make_border(index, DEFAULT_BORDER_WIDTH),
                 parent_surf=self.surf
             )
             for index, value in enumerate(puzzle.flatten())
         ]
 
-    def handle_number_entered(self, id, value, is_correct) -> None:
+    def __repr__(self):
+        return f'{self.cells}'  # pragma no cover
+
+    def handle_number_entered(self, index, value, is_correct) -> None:
         """Set new value to selected_id cell"""
-        if id is not None:
-            self.cells[id].value = value
-            self.cells[id].guessed = is_correct
-            self.cells[id].draw()
+        if index is not None:
+            self.cells[index].value = value
+            self.cells[index].guessed = is_correct
 
-    def handle_deleted(self, id: int) -> None:
-        if id is not None:
-            self.cells[id].value = 0
-            self.cells[id].draw()
+    def handle_deleted(self, index: int) -> None:
+        if index is not None:
+            self.cells[index].value = 0
+            self.cells[index].guessed = False
 
-    def handle_clicked(self, pos: Tuple) -> None:
+    def handle_clicked(self, pos: Tuple[int]) -> None:
         [cell.handle_clicked(pos) for cell in self.cells]
 
-    def set_hints(self, hint_on):
-        for cell in self.cells:
-            cell.hint = hint_on
-        self.draw()
+    def set_hints(self, value: bool) -> None:
+        for cell in self.cells:  # pragma no cover
+            cell.hint = value
 
     def draw(self) -> None:
         self.surf.fill(WHITE)
         [cell.draw() for cell in self.cells]
         self.game_screen.blit(self.surf, self.rect)
 
-    def get_value(self, id) -> int or None:
-        return self.cells[id].value
+    def get_value(self, index: int) -> int or None:
+        if 0 <= index < len(self.cells):
+            return self.cells[index].value
+        return None
 
     def get_values(self) -> List[int]:
         return [cell.value for cell in self.cells]
 
-    def _make_rect(self, index: int) -> pygame.Rect:
+    def _make_rect(self, offset: int) -> pygame.Rect:
         rect = pygame.Rect(
-            index // 9 * self.square_size,
-            index % 9 * self.square_size,
-            self.square_size,
-            self.square_size
+            (offset // 9 * self.square_size, offset % 9 * self.square_size),
+            (self.square_size, self.square_size)
         )
         return rect
 
-    def _make_border(self, index: int) -> List[int]:
-        t = 1
-        t2 = 2 * t
-        t4 = 4 * t
+    def _make_border(self, index: int, border=1) -> List[int]:
+        """Adjusts border thickness of a cell depending on cell's index
+        Returns list of [left, top, right, bottom] thickness in pixels
+        """
+        t = border
+        t2 = 2 * border
+        t4 = 4 * border
         ia = index + 1
         i9a = index + 9
 

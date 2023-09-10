@@ -6,7 +6,7 @@ import pygame
 import pygame_gui
 from pygame_gui.core import ObjectID
 
-from .constants import CUSTOM_EVENT, WHITE
+from .constants import CUSTOM_EVENT_TYPE, WHITE
 
 BASE_PATH = abspath(dirname(__file__))
 IMAGE_PATH = BASE_PATH + '/../img'
@@ -17,11 +17,11 @@ class RoundButton(pygame.sprite.Sprite):
         parent_surf: pygame.Surface,
         pos: pygame.Vector2,
         filepath: str,
-        id: str,
+        cid: str,
         *groups: pygame.sprite.Group
     ):
         super().__init__(*groups)
-        self.id = id
+        self.cid = cid
         self.image = pygame.image.load(filepath).convert_alpha()
         self.image_orig = self.image.copy()
         self.image_hover = self.image.copy()
@@ -41,12 +41,12 @@ class RoundButton(pygame.sprite.Sprite):
         x, y = pos
         if self.rect.collidepoint(x, y):
             event = pygame.event.Event(
-                CUSTOM_EVENT,
+                CUSTOM_EVENT_TYPE,
                 key='hud_button_clicked',
-                id=self.id)
+                cid=self.cid)
             pygame.event.post(event)
 
-    def handle_mouseover(self, pos: Tuple[int]):
+    def handle_mousemotion(self, pos: Tuple[int]):
         x, y = pos
         if self.rect.collidepoint(x, y):
             self.image = self.image_hover
@@ -87,7 +87,7 @@ class Hud:
                 parent_surf=self.bottom_surf,
                 pos=(2 + i*41, 5),
                 filepath=join(IMAGE_PATH, f'{label}.png'),
-                id=label
+                cid=label
             )
             self.controls_btm.append(button)
 
@@ -96,7 +96,7 @@ class Hud:
                 parent_surf=self.bottom_surf,
                 pos=(2 + 9*41, 5),
                 filepath=join(IMAGE_PATH, 'delete.png'),
-                id='delete'
+                cid='delete'
             )
         )
 
@@ -105,7 +105,7 @@ class Hud:
                 parent_surf=self.bottom_surf,
                 pos=(34 + 10*41, 5),
                 filepath=join(IMAGE_PATH, 'hint.png'),
-                id='hint'
+                cid='hint'
             )
         )
 
@@ -114,7 +114,7 @@ class Hud:
                 parent_surf=self.top_surf,
                 pos=(self.top_rect.width - 42, 0),
                 filepath=join(IMAGE_PATH, 'reset.png'),
-                id='reset'
+                cid='reset'
             )
         )
 
@@ -123,7 +123,7 @@ class Hud:
                 parent_surf=self.top_surf,
                 pos=(4, 2),
                 filepath=join(IMAGE_PATH, 'pause.png'),
-                id='pause'
+                cid='pause'
             )
         )
 
@@ -141,7 +141,7 @@ class Hud:
             ),
         )
 
-    def handle_ckicked(self, pos: Tuple[int]) -> None:
+    def handle_clicked(self, pos: Tuple[int]) -> None:
         x_top_panel, y_top_panel = x_btm_panel, y_btm_panel = pos
         x_top_panel -= self.top_rect.left
         y_top_panel -= self.top_rect.top
@@ -153,16 +153,16 @@ class Hud:
         [button.handle_clicked((x_top_panel, y_top_panel))
             for button in self.controls_top]
 
-    def handle_mousemotion(self, event: pygame.event.Event) -> None:
+    def process_mousemotion(self, event: pygame.event.Event) -> None:
         x_top_panel, y_top_panel = x_btm_panel, y_btm_panel = event.pos
         x_top_panel -= self.top_rect.left
         y_top_panel -= self.top_rect.top
         x_btm_panel -= self.bottom_rect.left
         y_btm_panel -= self.bottom_rect.top
 
-        [button.handle_mouseover((x_btm_panel, y_btm_panel))
+        [button.handle_mousemotion((x_btm_panel, y_btm_panel))
             for button in self.controls_btm]
-        [button.handle_mouseover((x_top_panel, y_top_panel))
+        [button.handle_mousemotion((x_top_panel, y_top_panel))
             for button in self.controls_top]
 
     def draw(self, elapsed_seconds, hint_on):

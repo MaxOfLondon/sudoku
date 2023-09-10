@@ -1,24 +1,25 @@
 # -*- coding: utf-8
 import asyncio
 import os
-from os.path import abspath, dirname
+from os.path import abspath, dirname, join
 from typing import List
 
 import pygame
 import pygame_gui
 
 from .board import Board
-from .constants import CHECK_GAME_OVER, CUSTOM_EVENT, HEIGHT, WIDTH
+from .constants import (CHECK_GAME_OVER_EVENT_TYPE, CUSTOM_EVENT_TYPE, FPS,
+                        HEIGHT, WIDTH)
 from .data import Data
 from .hud import Hud
 from .logic import Logic
 
 BASE_PATH = abspath(dirname(__file__))
-IMAGE_PATH = BASE_PATH + '/../img/'
-IMG_NAMES = [str(i) for i in range(1, 10)] \
-    + ['delete', 'hint', 'start', 'gameover', 'reset', 'pause']
+IMAGE_PATH = BASE_PATH + '/../img'
+IMG_NAMES = ['start', 'gameover', 'reset', 'pause']
 IMAGES = {
-    name: pygame.image.load(f'{IMAGE_PATH}{name}.png') for name in IMG_NAMES
+    name: pygame.image.load(join(IMAGE_PATH, f'{name}.png'))
+    for name in IMG_NAMES
 }
 
 difficulty = 50
@@ -54,9 +55,8 @@ class Game:
         self.logic = None
         self.elapsed_seconds = 0
         self.state = 'start'
-        # self.reset_game()
 
-    def reset_game(self) -> None:
+    def reset(self) -> None:
         self.selected_id = None
         self.hint_on = False
 
@@ -86,7 +86,6 @@ class Game:
                 ui_manager=self.ui_manager,
                 start_surf=self.start_img)
 
-        self.draw()
         self.elapsed_seconds = 0
 
     def draw(self) -> None:
@@ -94,12 +93,12 @@ class Game:
             self.game_screen.blit(self.start_img, self.game_screen_rect)
         self.draw_board_and_hud()
 
-    def get_expected_value(self, id) -> int:
-        col = id % 9
-        row = (id // 9) % 9
+    def get_solution_at_index(self, idx) -> int:
+        col = idx % 9
+        row = (idx // 9) % 9
         return self.solution[row, col]
 
-    def handle_input_key_down(self, event: pygame.event.Event) -> None:
+    def handle_keydown(self, event: pygame.event.Event) -> None:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 if self.state == 'playing':
@@ -107,16 +106,17 @@ class Game:
                     pygame.transform.grayscale(
                         self.game_screen, self.game_pause_screen)
                     self.state = 'pause'
-                    pygame.time.set_timer(CHECK_GAME_OVER, 0)
+                    pygame.time.set_timer(CHECK_GAME_OVER_EVENT_TYPE, 0)
                 elif self.state == 'pause':
                     self.game_screen.blit(
                         self.start_img, self.game_screen_rect)
                     self.state = 'playing'
-                    pygame.time.set_timer(CHECK_GAME_OVER, 1000)
+                    pygame.time.set_timer(CHECK_GAME_OVER_EVENT_TYPE, 1000)
             else:
                 if event.key >= pygame.K_0 and event.key <= pygame.K_9:
                     value = event.key - 48
-                    expeceted_value = self.get_expected_value(self.selected_id)
+                    expeceted_value = self.get_solution_at_index(
+                        self.selected_id)
                     self.board.handle_number_entered(
                         self.selected_id, value, value == expeceted_value)
                 elif event.key == pygame.K_h:
@@ -128,41 +128,41 @@ class Game:
                         or event.key == pygame.K_x:
                     self.board.handle_deleted(self.selected_id)
                 elif event.key == pygame.K_r:
-                    self.reset_game()
+                    self.reset()
                 elif event.key == pygame.K_f:
-                    pygame.time.set_timer(CHECK_GAME_OVER, 0)
+                    pygame.time.set_timer(CHECK_GAME_OVER_EVENT_TYPE, 0)
                     self.state = 'start'
 
-    def handle_hud_button_clicked(self, event: pygame.event.Event) -> None:
-        if event.id.isnumeric():
+    def handle_hud_custom_event(self, event: pygame.event.Event) -> None:
+        if event.cid.isnumeric():
             event = pygame.event.Event(
-                CUSTOM_EVENT,
+                CUSTOM_EVENT_TYPE,
                 key='number_entered',
-                value=int(event.id))
+                value=int(event.cid))
             pygame.event.post(event)
-        elif event.id == 'delete':
+        elif event.cid == 'delete':
             event = pygame.event.Event(
                 pygame.KEYDOWN,
                 key=pygame.K_DELETE)
             pygame.event.post(event)
-        elif event.id == 'hint':
+        elif event.cid == 'hint':
             event = pygame.event.Event(
                 pygame.KEYDOWN,
                 key=pygame.K_h)
             pygame.event.post(event)
-        elif event.id == 'pause':
+        elif event.cid == 'pause':
             event = pygame.event.Event(
                 pygame.KEYDOWN,
                 key=pygame.K_SPACE)
             pygame.event.post(event)
-        elif event.id == 'reset':
+        elif event.cid == 'reset':
             event = pygame.event.Event(
                 pygame.KEYDOWN,
                 key=pygame.K_r)
             pygame.event.post(event)
 
     def handle_custom_events(self, event: pygame.event.Event) -> None:
-        if event.type == CUSTOM_EVENT and hasattr(event, 'key'):
+        if event.type == CUSTOM_EVENT_TYPE and hasattr(event, 'key'):
             if event.key == 'hint_toggle':
                 event = pygame.event.Event(
                     pygame.KEYDOWN,
@@ -170,24 +170,24 @@ class Game:
                 )
                 pygame.event.post(event)
             if event.key == 'selection_change':
-                id = event.id
+                cid = event.cid
                 selected = event.selected
                 if not selected:
                     self.selected_id = None
-                if self.selected_id is not None and self.selected_id != id:
+                if self.selected_id is not None and self.selected_id != cid:
                     self.board.cells[self.selected_id].selected = False
-                self.selected_id = id
+                self.selected_id = cid
             if event.key == 'number_entered':
                 if self.selected_id:
                     value = event.value
-                    expeceted_value = self.get_expected_value(
+                    expeceted_value = self.get_solution_at_index(
                         self.selected_id)
                     self.board.handle_number_entered(
                         self.selected_id, value, value == expeceted_value)
             if event.key == 'hud_button_clicked':
-                self.handle_hud_button_clicked(event)
+                self.handle_hud_custom_event(event)
 
-        if event.type == CHECK_GAME_OVER:
+        if event.type == CHECK_GAME_OVER_EVENT_TYPE:
             if self.logic.is_game_over(
                 self.board.get_values(),
                 self.solution.flatten()
@@ -200,11 +200,11 @@ class Game:
                 )
                 self.state = 'gameover'
 
-    def handle_input_quit(self, event: pygame.event.Event) -> None:
+    def handle_quit_events(self, event: pygame.event.Event) -> None:
         if event.type == pygame.QUIT:
             self.running = False
 
-    def handle_input_mousedown(self, event: pygame.event.Event) -> None:
+    def handle_mousedown(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.state == 'playing':
                 x, y = x_board, y_board = pygame.mouse.get_pos()
@@ -215,7 +215,7 @@ class Game:
                 y_board -= self.board.rect.top - 1
                 [self.board.handle_clicked((x_board, y_board))]
 
-                self.hud.handle_ckicked((x, y))
+                self.hud.handle_clicked((x, y))
 
             elif self.state == 'pause':
                 event = pygame.event.Event(
@@ -223,55 +223,55 @@ class Game:
                     key=pygame.K_SPACE)
                 pygame.event.post(event)
 
-    def handle_input_mosusemove(self, event: pygame.event.Event) -> None:
+    def handle_mousemotion(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEMOTION:
             if self.state == 'playing':
-                self.hud.handle_mousemotion(event)
+                self.hud.process_mousemotion(event)
 
     def handle_difficulty_change(self, event: pygame.event.Event) -> None:
         if event.type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
             self.difficulty = int(event.value)
 
-    def handle_start(self, event: pygame.event.Event) -> None:
+    def handle_start_state_events(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.reset_game()
-            pygame.time.set_timer(CHECK_GAME_OVER, 1000)
+            self.reset()
+            pygame.time.set_timer(CHECK_GAME_OVER_EVENT_TYPE, 1000)
             self.state = 'playing'
             self.elapsed_seconds = 0
 
-    def handle_gameover(self, event: pygame.event.Event) -> None:
+    def process_gameover(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEBUTTONDOWN:
-            self.reset_game()
+            self.reset()
             self.state = 'start'
-            pygame.time.set_timer(CHECK_GAME_OVER, 1000)
+            pygame.time.set_timer(CHECK_GAME_OVER_EVENT_TYPE, 1000)
 
-    def handle_reset(self) -> None:
-        self.reset_game()
+    def process_reset(self) -> None:
+        self.reset()
         self.state = 'playing'
 
     def process_pause_state_events(self, events: List[pygame.event.Event]) \
             -> None:
         for event in events:
-            self.handle_input_key_down(event)
-            self.handle_input_quit(event)
-            self.handle_input_mousedown(event)
+            self.handle_keydown(event)
+            self.handle_quit_events(event)
+            self.handle_mousedown(event)
 
     def process_playing_state_events(self, events: List[pygame.event.Event]) \
             -> None:
         for event in events:
             self.handle_custom_events(event)
-            self.handle_input_key_down(event)
-            self.handle_input_quit(event)
-            self.handle_input_mosusemove(event)
-            self.handle_input_mousedown(event)
+            self.handle_keydown(event)
+            self.handle_quit_events(event)
+            self.handle_mousemotion(event)
+            self.handle_mousedown(event)
             self.handle_difficulty_change(event)
             self.ui_manager.process_events(event)
 
-    def handle_start_state_events(self, events: List[pygame.event.Event]) \
+    def process_start_state_events(self, events: List[pygame.event.Event]) \
             -> None:
         for event in events:
-            self.handle_start(event)
-            self.handle_input_quit(event)
+            self.handle_start_state_events(event)
+            self.handle_quit_events(event)
 
     def draw_board_and_hud(self) -> None:
         self.board.draw()
@@ -282,23 +282,22 @@ class Game:
         """Game loop"""
         self.running = True
         while self.running:
-            time_delta = self.clock.tick(60)/1000.0
+            time_delta = self.clock.tick(FPS)/1000.0
             events = pygame.event.get()
             if self.state == 'playing':
                 self.elapsed_seconds += time_delta
                 self.ui_manager.update(time_delta)
                 self.draw_board_and_hud()
                 self.process_playing_state_events(events)
-                self.board.draw()
             elif self.state == 'start':
                 self.game_screen.blit(self.start_img, self.game_screen_rect)
-                self.handle_start_state_events(events)
+                self.process_start_state_events(events)
             elif self.state == 'gameover':
                 self.game_screen.blit(
                     self.gameover_screen, self.game_screen_rect)
                 for event in events:
-                    self.handle_gameover(event)
-                    self.handle_input_quit(event)
+                    self.process_gameover(event)
+                    self.handle_quit_events(event)
             elif self.state == 'pause':
                 self.game_screen.blit(
                     self.game_pause_screen, self.game_screen_rect)

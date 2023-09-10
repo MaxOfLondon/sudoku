@@ -1,3 +1,5 @@
 .venv
 src/build
 __pycache__
+.coverage
+.pytestcache
