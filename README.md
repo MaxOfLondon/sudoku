@@ -1,4 +1,5 @@
 # Sudoku
+[![CI Sudoku workflow](https://github.com/MaxOfLondon/sudoku/actions/workflows/deploy-pygame.yml/badge.svg)](https://github.com/MaxOfLondon/sudoku/actions/workflows/deploy-pygame.yml)
 
 Yet another Sudoku game in python.
 
