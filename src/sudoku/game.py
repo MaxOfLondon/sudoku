@@ -178,7 +178,7 @@ class Game:
                     self.board.cells[self.selected_id].selected = False
                 self.selected_id = cid
             if event.key == 'number_entered':
-                if self.selected_id:
+                if self.selected_id > -1:
                     value = event.value
                     expeceted_value = self.get_solution_at_index(
                         self.selected_id)
