@@ -1,15 +1,13 @@
 # Sudoku
 [![CI Sudoku workflow](https://github.com/MaxOfLondon/sudoku/actions/workflows/deploy-pygame.yml/badge.svg)](https://github.com/MaxOfLondon/sudoku/actions/workflows/deploy-pygame.yml)
-
-Yet another Sudoku game in python.
-
+ 
 ## Description
 
-Pgame implementation of popular Sudoku game with setup for pygbag wasm.
+An OO implementation of Sudoku game in Python Pygame with Pygbag wasm. The game can be run as stand alone app or as a browser game.
 
 Play [Sudoku](https://maxoflondon.github.io/sudoku/index.html) now on Github.
 
-> **_NOTE:_** Takes some time to load first time, please be patient.
+> **_NOTE:_** It will take some time to load for the first time in the browser because all dependencies are being downloaded and game assembled but subsequent run should be much faster, please be patient.
 
 ### Installing
 
@@ -39,7 +37,7 @@ pip install -r requirements/prod.txt
 
 ### Executing program
 
-You can test run the game using `install-and-test-run.sh` script. It will offer to launch game with python and then in the web browser.
+You can test run the game using `install-and-test-run.sh` script. It will offer to launch game with python and then in the web browser via local test server.
 
 Altenatively, to run game manually with Python:
 
@@ -58,13 +56,13 @@ pygbag --ume_block=0 src
 
 Game rules and how to play instructions can be found on [sudoku.com](https://sudoku.com/how-to-play/sudoku-rules-for-complete-beginners/).
 
-Select an empty cell then using keyboard enter a number or click on number button at the bottom.
+Select an empty cell then using keyboard enter a number or click on a number button at the bottom.
 
-To restart the game with difficulty adjusted, slide the slider at the top to desired position then press R key or click R button in the top-right corner. Game is easier with slider closer to the left edge and harder to the right edge. The default position is 50%.
+To restart the game with difficulty adjusted, slide the slider at the top to desired position then press <kbd>R</kbd> key or click R button in the top-right corner. Game is easier with slider closer to the left edge and harder when slider is to the right. The default position is 50%.
 
-To display hints (incorrectly entered numbers will be highlited), press H key or click lightbulb button in the bottom-right corner.
+To display hints (incorrectly entered numbers will be highlited), press <kbd>H</kbd> key or click lightbulb button in the bottom-right corner. Hit <kbd>H</kbd> again to toggle hints off.
 
-To pause the game, press SPACEBAR key or click the pause button in the top-left corner.
+To pause the game, press <kbd>SPACEBAR</kbd> key or click the pause button in the top-left corner.
 
 ## Screenshot
 
